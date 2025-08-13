@@ -1,9 +1,10 @@
 {
   "mcpServers": {
     "smart-code-reviewer": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "e:\\\\pcm\\\\dist\\\\index.js"
+        "-y",
+        "https://github.com/renjismzy/mcp-code.git"
       ],
       "env": {
         "MCP_LOG_LEVEL": "info",
