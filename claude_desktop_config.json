@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "smart-code-reviewer": {
+      "command": "node",
+      "args": [
+        "e:\\\\pcm\\\\dist\\\\index.js"
+      ],
+      "env": {
+        "MCP_LOG_LEVEL": "info",
+        "MCP_MAX_CODE_SIZE": "50000",
+        "MCP_TIMEOUT": "30000"
+      }
+    }
+  }
+}

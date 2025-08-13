@@ -1,0 +1,1 @@
+{"version":3,"file":"refactoringSuggester.d.ts","sourceRoot":"","sources":["../../src/tools/refactoringSuggester.ts"],"names":[],"mappings":"AAAA,OAAO,EAAyB,iBAAiB,EAAE,MAAM,mBAAmB,CAAC;AAE7E;;GAEG;AACH,wBAAsB,kBAAkB,CACtC,IAAI,EAAE,MAAM,EACZ,QAAQ,EAAE,MAAM,EAChB,KAAK,GAAE,aAAa,GAAG,aAAa,GAAG,iBAAiB,GAAG,KAAa,GACvE,OAAO,CAAC,iBAAiB,CAAC,CA8C5B"}
