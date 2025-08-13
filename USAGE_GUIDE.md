@@ -19,36 +19,7 @@
 
 ### 2. 项目构建
 
-```bash
-# 克隆或下载项目到本地
-cd 你要下载的地方
-
-# 安装依赖
-npm install
-
-# 构建项目
-npm run build
-
-# 验证构建结果
-ls dist/
-```
-
-### 3. 测试服务器
-
-```bash
-# 启动服务器进行测试
-npm start
-```
-
-## ⚙️ Claude Desktop 配置
-
-### 1. 找到配置文件
-
-Claude Desktop 的配置文件位置：
-
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Linux**: `~/.config/Claude/claude_desktop_config.json`
+下载uv包
 
 ### 2. 添加 MCP 服务器配置
 
@@ -58,9 +29,10 @@ Claude Desktop 的配置文件位置：
 {
   "mcpServers": {
     "smart-code-reviewer": {
-      "command": "node",
+      "command": "npx",
       "args": [
-        "下载的地方"
+        "-y",
+        "https://github.com/renjismzy/mcp-code.git"
       ],
       "env": {
         "MCP_LOG_LEVEL": "info",
@@ -71,11 +43,6 @@ Claude Desktop 的配置文件位置：
   }
 }
 ```
-
-**注意事项：**
-- 将路径 `下载的地方` 替换为实际的构建路径你的实际项目路径
-- Windows 路径需要使用双反斜杠 `\\`
-- 确保路径指向构建后的 `dist/index.js` 文件
 
 ### 3. 重启 Claude Desktop
 
