@@ -172,6 +172,34 @@ async function analyzeReadabilityIssues(code, language, suggestions) {
                 effort: 'low'
             });
         }
+        // 新增: 检测过长的变量名
+        if (hasLongVariableNames(trimmedLine)) {
+            suggestions.push({
+                type: 'readability',
+                priority: 'low',
+                title: '变量名过长',
+                description: '缩短变量名以提高可读性，同时保持描述性',
+                line: lineNumber,
+                originalCode: line,
+                suggestedCode: shortenVariableNames(line, language),
+                impact: '改善代码流畅性',
+                effort: 'low'
+            });
+        }
+        // 新增: 检测缺少空格的运算符
+        if (hasMissingSpacesAroundOperators(trimmedLine)) {
+            suggestions.push({
+                type: 'readability',
+                priority: 'low',
+                title: '缺少运算符周围空格',
+                description: '在运算符周围添加空格以提高可读性',
+                line: lineNumber,
+                originalCode: line,
+                suggestedCode: addSpacesAroundOperators(line, language),
+                impact: '提升代码视觉清晰度',
+                effort: 'low'
+            });
+        }
     });
     // 检测缺少注释的复杂函数
     const functions = extractFunctions(code, language);
@@ -230,14 +258,14 @@ async function analyzeMaintainabilityIssues(code, language, suggestions) {
     });
     // 检测过多的参数
     functions.forEach(func => {
-        if (func.parameterCount > 5) {
+        if (func.params > 5) {
             suggestions.push({
                 type: 'maintainability',
                 priority: 'medium',
                 title: '函数参数过多',
                 description: '考虑使用对象参数或拆分函数',
                 line: func.startLine,
-                originalCode: func.signature,
+                originalCode: func.code.split('\n')[0],
                 suggestedCode: refactorParameters(func, language),
                 impact: '提高函数可读性和易用性',
                 effort: 'medium'
@@ -326,6 +354,20 @@ async function analyzeJavaScriptRefactoring(code, suggestions) {
                 effort: 'low'
             });
         }
+        // 新增: 建议使用async/await
+        if (trimmedLine.includes('.then(')) {
+            suggestions.push({
+                type: 'modernization',
+                priority: 'medium',
+                title: '使用async/await',
+                description: '使用async/await替代Promise链',
+                line: lineNumber,
+                originalCode: line,
+                suggestedCode: 'async function example() { await promise; }',
+                impact: '提高异步代码可读性',
+                effort: 'medium'
+            });
+        }
     });
 }
 /**
@@ -378,6 +420,20 @@ async function analyzePythonRefactoring(code, suggestions) {
                 effort: 'low'
             });
         }
+        // 新增: 建议使用生成器
+        if (trimmedLine.includes('yield')) {
+            suggestions.push({
+                type: 'pythonic',
+                priority: 'medium',
+                title: '优化生成器使用',
+                description: '确保生成器在适当场景中使用以节省内存',
+                line: lineNumber,
+                originalCode: line,
+                suggestedCode: line,
+                impact: '降低内存消耗',
+                effort: 'medium'
+            });
+        }
     });
 }
 /**
@@ -427,6 +483,20 @@ async function analyzeJavaRefactoring(code, suggestions) {
                 originalCode: line,
                 suggestedCode: convertToTryWithResources(line),
                 impact: '提高资源管理安全性',
+                effort: 'medium'
+            });
+        }
+        // 新增: 建议使用记录类
+        if (trimmedLine.includes('class') && isDataClass(lines, index)) {
+            suggestions.push({
+                type: 'modernization',
+                priority: 'medium',
+                title: '使用记录类',
+                description: '对于数据持有类，使用Java 14+的记录类简化代码',
+                line: lineNumber,
+                originalCode: line,
+                suggestedCode: 'record DataClass(...) {}',
+                impact: '减少样板代码',
                 effort: 'medium'
             });
         }
@@ -602,12 +672,72 @@ function calculateNestingLevel(lines, index) {
     return level;
 }
 function extractFunctions(code, language) {
-    // 简化的函数提取逻辑
-    return [];
+    const functions = [];
+    const lines = code.split('\n');
+    let currentFunc = null;
+    let nesting = 0;
+    let langRegex;
+    switch (language.toLowerCase()) {
+        case 'javascript':
+        case 'typescript':
+            langRegex = /^\s*(?:function\s+(\w+)\s*\(([^)]*)\)|const\s+(\w+)\s*=\s*\(([^)]*)\)\s*=>)/;
+            break;
+        case 'python':
+            langRegex = /^\s*def\s+(\w+)\s*\(([^)]*)\):/;
+            break;
+        case 'java':
+            langRegex = /^\s*(?:public|private|protected)?\s*(?:static)?\s*\w+\s+(\w+)\s*\(([^)]*)\)\s*\{/;
+            break;
+        default:
+            return [];
+    }
+    lines.forEach((line, index) => {
+        const match = line.match(langRegex);
+        if (match) {
+            currentFunc = {
+                name: match[1] || match[3] || '',
+                params: (match[2] || match[4] || '').split(',').length,
+                startLine: index + 1,
+                code: line,
+                complexity: 1,
+                hasComments: line.includes('//') || line.includes('/*') || line.includes('#'),
+                lineCount: 1
+            };
+            nesting = line.includes('{') || language === 'python' ? 1 : 0;
+            functions.push(currentFunc);
+        }
+        else if (currentFunc) {
+            currentFunc.code += '\n' + line;
+            currentFunc.lineCount++;
+            currentFunc.complexity += (line.match(/if|for|while|switch/g) || []).length + 1;
+            if (line.includes('//') || line.includes('/*') || line.includes('#'))
+                currentFunc.hasComments = true;
+            nesting += (line.match(/\{/g) || []).length - (line.match(/\}/g) || []).length;
+            if (nesting <= 0)
+                currentFunc = null;
+        }
+    });
+    return functions;
 }
 function findDuplicateCode(lines) {
-    // 简化的重复代码检测
-    return [];
+    const duplicates = [];
+    const minLength = 3;
+    const codeMap = new Map();
+    for (let i = 0; i < lines.length; i++) {
+        for (let len = minLength; len <= 10 && i + len <= lines.length; len++) {
+            const block = lines.slice(i, i + len).join('\n').trim();
+            if (block) {
+                const key = block.replace(/\s+/g, ' ');
+                if (codeMap.has(key)) {
+                    duplicates.push({ lines: [i + 1, codeMap.get(key)], code: block });
+                }
+                else {
+                    codeMap.set(key, i + 1);
+                }
+            }
+        }
+    }
+    return duplicates;
 }
 function generateRefactoringSummary(suggestions, focus) {
     const total = suggestions.length;
@@ -623,5 +753,22 @@ function generateRefactoringSummary(suggestions, focus) {
         summary += ` ${type}: ${count}个；`;
     });
     return summary;
+}
+function hasLongVariableNames(line) {
+    const variables = line.match(/\b[a-zA-Z_]{15,}\b/g);
+    return variables !== null && variables.length > 0;
+}
+function shortenVariableNames(line, language) {
+    return line.replace(/\b[a-zA-Z_]{15,}\b/g, 'shortenedName');
+}
+function hasMissingSpacesAroundOperators(line) {
+    return /\d+[+*/-]\d+/.test(line) || /=[^= ]/.test(line);
+}
+function addSpacesAroundOperators(line, language) {
+    return line.replace(/(\d+)([+*/-])(\d+)/g, '$1 $2 $3').replace(/=([^= ])/g, '= $1');
+}
+function isDataClass(lines, index) {
+    // 简单检查是否为数据类
+    return lines[index + 1]?.includes('private') && lines[index + 2]?.includes('getter');
 }
 //# sourceMappingURL=refactoringSuggester.js.map

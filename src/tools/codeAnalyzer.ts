@@ -333,7 +333,8 @@ function calculateCyclomaticComplexity(code: string): number {
   ];
   
   decisionKeywords.forEach(keyword => {
-    const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+    const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`\\b${escapedKeyword}\\b`, 'gi');
     const matches = code.match(regex);
     if (matches) {
       complexity += matches.length;
