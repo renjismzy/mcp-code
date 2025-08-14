@@ -1,50 +1,264 @@
-《smart-code-reviewer 使用教程》
-一、工具简介
-smart-code-reviewer 是基于 mcp-code 项目开发的代码审查工具，可通过简单配置快速部署并实现代码自动化审查功能，支持自定义日志级别、最大代码处理规模及超时时间等参数。
-二、前提条件
-已安装 Python 环境（建议 Python 3.8+）
-已安装 uv 工具（Python 包管理工具，若未安装可通过 pip install uv 命令安装）
-网络环境可访问 GitHub（用于拉取项目代码）
-三、部署与启动步骤
-1. 配置参数说明
-在启动工具前，需了解核心配置参数的含义（对应提供的 JSON 配置）：
-command: 启动命令，此处为 uv（使用 uv 工具执行）
-args: 命令参数，-y 表示自动确认所有提示，https://github.com/renjismzy/mcp-code.git 是项目代码仓库地址
-env: 环境变量
-MCP_LOG_LEVEL: 日志级别，info 表示输出信息级别的日志（包含正常运行信息）
-MCP_MAX_CODE_SIZE: 最大代码处理规模，50000 表示最多处理 50000 字符的代码
-MCP_TIMEOUT: 超时时间，30000 表示 30000 毫秒（30 秒）后未完成操作则超时
-2. 启动工具
-方式一：直接执行命令
-在终端中输入以下命令，即可基于配置启动工具：
-bash
-MCP_LOG_LEVEL=info MCP_MAX_CODE_SIZE=50000 MCP_TIMEOUT=30000 uv -y https://github.com/renjismzy/mcp-code.git
-方式二：通过脚本启动（推荐）
-创建一个脚本文件（如 start-reviewer.sh）
-写入以下内容：
-bash
-#!/bin/bash
-# 设置环境变量
-export MCP_LOG_LEVEL=info
-export MCP_MAX_CODE_SIZE=50000
-export MCP_TIMEOUT=30000
-# 启动工具
-uv -y https://github.com/renjismzy/mcp-code.git
-赋予脚本执行权限：chmod +x start-reviewer.sh
-运行脚本：./start-reviewer.sh
-四、使用流程
-启动工具：按照上述步骤启动 smart-code-reviewer，工具会自动拉取 mcp-code 仓库代码
-代码审查：工具会根据配置的参数（最大代码规模、超时时间等）对拉取的代码进行自动审查
-查看结果：审查过程中，工具会通过 info 级别的日志输出审查进度和结果（如代码中的潜在问题、规范不符项等）
-结束运行：审查完成或达到超时时间后，工具会自动停止运行
-五、参数自定义
-若需调整工具行为，可修改环境变量参数：
-若需要更详细的日志（如调试信息），可将 MCP_LOG_LEVEL 改为 debug
-若需处理更大规模的代码，可增大 MCP_MAX_CODE_SIZE 的值（如 100000 表示处理 100000 字符）
-若需延长超时时间，可增大 MCP_TIMEOUT 的值（如 60000 表示 60 秒超时）
-修改后重启工具即可生效。
-六、常见问题
-拉取代码失败：检查网络是否通畅，或仓库地址是否正确（确认 https://github.com/renjismzy/mcp-code.git 可访问）
-超时频繁：若代码规模较大，可适当增大 MCP_TIMEOUT 的值
-日志无输出：检查 MCP_LOG_LEVEL 是否设置正确，避免设置为 error 或 warn 时遗漏信息级日志
-通过以上步骤，即可快速部署并使用 smart-code-reviewer 进行代码审查，如需进一步定制功能，可参考 mcp-code 项目的源码进行二次开发。
+# 智能代码审查助手 MCP
+
+一个功能强大的 Model Context Protocol (MCP) 服务器，提供全面的代码质量分析、安全检测、重构建议和文档生成功能。
+
+## ✨ 主要特性
+
+### 🔍 代码质量分析
+- **多维度质量评估**：代码行数、复杂度、可维护性指数等
+- **问题检测**：样式问题、性能问题、可维护性问题
+- **多语言支持**：JavaScript/TypeScript、Python、Java等
+- **智能建议**：提供具体的改进建议和最佳实践
+
+### 🛡️ 安全漏洞检测
+- **常见安全问题**：硬编码密码、代码注入、SQL注入等
+- **语言特定检测**：XSS、原型污染、不安全反序列化等
+- **风险评估**：提供详细的风险评分和修复建议
+- **CWE映射**：与通用弱点枚举标准对应
+
+### 🔧 智能重构建议
+- **性能优化**：循环优化、字符串拼接改进等
+- **可读性提升**：复杂条件简化、变量命名改进等
+- **可维护性增强**：重复代码提取、函数拆分等
+- **现代化建议**：使用最新语言特性和最佳实践
+
+### 📊 复杂度分析
+- **圈复杂度**：McCabe复杂度计算
+- **认知复杂度**：代码理解难度评估
+- **Halstead复杂度**：程序复杂度的数学度量
+- **可维护性指数**：综合可维护性评分
+
+### 📚 文档生成
+- **多种格式**：Markdown、JSDoc、内联注释
+- **智能分析**：自动提取函数、类、方法信息
+- **使用示例**：生成代码使用示例
+- **API文档**：完整的API文档生成
+
+## 🚀 快速开始
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 构建项目
+
+```bash
+npm run build
+```
+
+### 启动服务器
+
+```bash
+npm start
+```
+
+### 开发模式
+
+```bash
+npm run dev
+```
+
+## 🛠️ 工具说明
+
+### 1. analyze_code_quality
+
+分析代码质量，检测潜在问题和改进建议。
+
+**参数：**
+- `code` (string): 要分析的代码内容
+- `language` (string): 编程语言
+- `filename` (string, 可选): 文件名
+
+**示例：**
+```json
+{
+  "code": "function example() { var x = 1; if (x == 1) console.log('test'); }",
+  "language": "javascript",
+  "filename": "example.js"
+}
+```
+
+### 2. generate_documentation
+
+为代码生成详细的文档和注释。
+
+**参数：**
+- `code` (string): 要生成文档的代码
+- `language` (string): 编程语言
+- `docType` (string): 文档类型 (inline/markdown/jsdoc)
+
+**示例：**
+```json
+{
+  "code": "function calculateSum(a, b) { return a + b; }",
+  "language": "javascript",
+  "docType": "markdown"
+}
+```
+
+### 3. detect_security_issues
+
+检测代码中的安全漏洞和风险。
+
+**参数：**
+- `code` (string): 要检测的代码
+- `language` (string): 编程语言
+
+**示例：**
+```json
+{
+  "code": "const password = 'hardcoded123'; eval(userInput);",
+  "language": "javascript"
+}
+```
+
+### 4. suggest_refactoring
+
+提供代码重构建议，改善代码结构和可读性。
+
+**参数：**
+- `code` (string): 要重构的代码
+- `language` (string): 编程语言
+- `focus` (string): 重构重点 (performance/readability/maintainability/all)
+
+**示例：**
+```json
+{
+  "code": "for(var i=0;i<arr.length;i++){if(arr[i]==target){return i;}}",
+  "language": "javascript",
+  "focus": "performance"
+}
+```
+
+### 5. calculate_complexity
+
+计算代码复杂度指标。
+
+**参数：**
+- `code` (string): 要分析的代码
+- `language` (string): 编程语言
+
+**示例：**
+```json
+{
+  "code": "function complexFunction(x) { if (x > 0) { for (let i = 0; i < x; i++) { if (i % 2 === 0) { console.log(i); } } } }",
+  "language": "javascript"
+}
+```
+
+## 📋 支持的编程语言
+
+- **JavaScript/TypeScript**: 全功能支持
+- **Python**: 全功能支持
+- **Java**: 全功能支持
+- **SQL**: 安全检测支持
+- **其他语言**: 基础分析支持
+
+## 🎯 使用场景
+
+### 代码审查
+在代码审查过程中，使用本工具快速识别代码质量问题、安全漏洞和改进机会。
+
+### 重构指导
+在重构代码时，获得具体的重构建议和优先级指导。
+
+### 安全审计
+在安全审计中，自动检测常见的安全漏洞和风险点。
+
+### 文档生成
+自动生成代码文档，提高项目的可维护性。
+
+### 教学辅助
+帮助开发者学习最佳实践和代码质量标准。
+
+## 📊 分析报告示例
+
+### 代码质量分析报告
+```json
+{
+  "filename": "example.js",
+  "language": "javascript",
+  "metrics": {
+    "linesOfCode": 45,
+    "complexity": 8,
+    "maintainabilityIndex": 72.5
+  },
+  "issues": [
+    {
+      "type": "style",
+      "severity": "warning",
+      "message": "建议使用let或const替代var",
+      "line": 3,
+      "rule": "no-var"
+    }
+  ],
+  "overallScore": 85,
+  "recommendations": [
+    "使用现代JavaScript语法",
+    "添加错误处理机制"
+  ]
+}
+```
+
+### 安全扫描报告
+```json
+{
+  "language": "javascript",
+  "totalIssues": 2,
+  "criticalIssues": 1,
+  "riskScore": 15,
+  "issues": [
+    {
+      "type": "hardcoded-credentials",
+      "severity": "critical",
+      "message": "检测到硬编码的敏感信息",
+      "cwe": "CWE-798",
+      "recommendation": "使用环境变量存储敏感信息"
+    }
+  ]
+}
+```
+
+## 🔧 配置选项
+
+### 环境变量
+- `MCP_LOG_LEVEL`: 日志级别 (debug/info/warn/error)
+- `MCP_MAX_CODE_SIZE`: 最大代码大小限制
+- `MCP_TIMEOUT`: 分析超时时间
+
+### 自定义规则
+可以通过配置文件自定义分析规则和阈值。
+
+## 🤝 贡献指南
+
+欢迎贡献代码！请遵循以下步骤：
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 📝 许可证
+
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情。
+
+## 🙏 致谢
+
+- Model Context Protocol 团队
+- 开源社区的贡献者们
+- 代码质量分析领域的研究者们
+
+## 📞 联系我们
+
+如有问题或建议，请通过以下方式联系：
+
+- 提交 Issue
+- 发送邮件
+- 参与讨论
+
+---
+
+**让代码审查变得更智能、更高效！** 🚀
